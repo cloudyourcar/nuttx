@@ -117,6 +117,7 @@
 
 void stm32_clockconfig(void)
 {
+
   /* Make sure that we are starting in the reset state */
 
   rcc_reset();
@@ -183,3 +184,12 @@ void stm32_clockenable(void)
 #endif
 }
 #endif
+
+
+uint32_t stm32_rcc_reset_reason(void)
+{
+    return getreg32(STM32_RCC_CSR) & (RCC_CSR_PINRSTF | RCC_CSR_PORRSTF |
+                RCC_CSR_SFTRSTF | RCC_CSR_IWDGRSTF | RCC_CSR_WWDGRSTF |
+                RCC_CSR_LPWRRSTF);
+}
+

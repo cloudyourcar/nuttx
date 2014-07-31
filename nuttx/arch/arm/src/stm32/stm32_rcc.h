@@ -295,6 +295,17 @@ void stm32_rcc_enablelsi(void);
 
 void stm32_rcc_disablelsi(void);
 
+/****************************************************************************
+ * Name: stm32_rcc_reset_reason
+ *
+ * Description:
+ *   Return bitmask with reset reason (see RCC_CSR register)
+ *
+ ****************************************************************************/
+
+uint32_t stm32_rcc_reset_reason(void);
+
+
 #undef EXTERN
 #if defined(__cplusplus)
 }
