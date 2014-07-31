@@ -51,6 +51,7 @@
 #include <sys/types.h>
 
 #include <nuttx/fs/ioctl.h>
+#include <sys/types.h>
 
 #ifdef CONFIG_PLATFORM_CONFIGDATA
 
