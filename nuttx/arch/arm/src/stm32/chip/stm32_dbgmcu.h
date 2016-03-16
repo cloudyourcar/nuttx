@@ -80,7 +80,7 @@
 #  define DBGMCU_CR_SYNCH2        (2 << DBGMCU_CR_TRACEMODE_SHIFT) /* Synchronous Mode, TRACEDATA size=2 */
 #  define DBGMCU_CR_SYNCH4        (3 << DBGMCU_CR_TRACEMODE_SHIFT) /* Synchronous Mode, TRACEDATA size=4 */
 
-#ifdef CONFIG_STM32_STM32F10XX
+#if defined(CONFIG_STM32_STM32F10XX) || defined(CONFIG_STM32_STM32L15XX)
 #  define DBGMCU_CR_IWDGSTOP      (1 << 8)   /* Bit 8: Independent Watchdog stopped when core is halted */
 #  define DBGMCU_CR_WWDGSTOP      (1 << 9)   /* Bit 9: Window Watchdog stopped when core is halted */
 #  define DBGMCU_CR_TIM1STOP      (1 << 10)  /* Bit 10: TIM1 stopped when core is halted */

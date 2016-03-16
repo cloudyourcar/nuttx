@@ -69,7 +69,7 @@ CSRCS += up_qencoder.c
 endif
 
 ifeq ($(CONFIG_WATCHDOG),y)
-CSRCS += up_watchdog.c
+CSRCS += stm32_watchdog.c
 endif
 
 ifeq ($(CONFIG_NSH_ARCHINIT),y)
