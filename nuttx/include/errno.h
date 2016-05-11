@@ -378,6 +378,8 @@ extern "C"
  */
 
 FAR int *get_errno_ptr(void);
+int handle_globalerrno(void);
+void set_globalerrno(int val);
 
 #ifndef __DIRECT_ERRNO_ACCESS
 void set_errno(int errcode);

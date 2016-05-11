@@ -62,6 +62,23 @@
 
 static int g_irqerrno;
 
+//TODO: Handle it properly, find proper way
+/* This flag has been added to ensure basic communication between interrupts and threads */
+
+
+static int g_globalerrno;
+
+int handle_globalerrno(void)
+{
+    int err = g_globalerrno;
+    g_globalerrno = 0;
+    return err;
+}
+
+void set_globalerrno(int val)
+{
+    g_globalerrno = val ;
+}
 /****************************************************************************
  * Public Functions
  ****************************************************************************/

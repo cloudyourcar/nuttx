@@ -1214,7 +1214,6 @@ static void up_set_format(struct uart_dev_s *dev)
   uint32_t mantissa;
   uint32_t fraction;
   uint32_t brr;
-
   /* Configure the USART Baud Rate.  The baud rate for the receiver and
    * transmitter (Rx and Tx) are both set to the same value as programmed
    * in the Mantissa and Fraction values of USARTDIV.
@@ -1251,13 +1250,13 @@ static void up_set_format(struct uart_dev_s *dev)
   regval &= ~(USART_CR1_PCE | USART_CR1_PS | USART_CR1_M);
 
   if (priv->parity == 1)       /* Odd parity */
-    {
+  {
       regval |= (USART_CR1_PCE | USART_CR1_PS);
-    }
-  else if (priv->parity == 2)  /* Even parity */
-    {
+  }
+  else if(priv->parity == 2)  /* Even parity */
+  {
       regval |= USART_CR1_PCE;
-    }
+  }
 
   /* Configure word length (parity uses one of configured bits)
    *
@@ -1719,7 +1718,6 @@ static int up_interrupt_common(struct up_dev_s *priv)
 {
   int  passes;
   bool handled;
-
   /* Report serial activity to the power management logic */
 
 #if defined(CONFIG_PM) && CONFIG_PM_SERIAL_ACTIVITY > 0
@@ -1730,6 +1728,8 @@ static int up_interrupt_common(struct up_dev_s *priv)
    * until we have been looping for a long time.
    */
 
+
+
   handled = true;
   for (passes = 0; passes < 256 && handled; passes++)
     {
@@ -1738,6 +1738,10 @@ static int up_interrupt_common(struct up_dev_s *priv)
       /* Get the masked USART status word. */
 
       priv->sr = up_serialin(priv, STM32_USART_SR_OFFSET);
+      if((priv->sr & USART_SR_PE) != 0)
+      {
+          set_globalerrno(EINTR); // But we still have to read buffer to clear interrupt flag
+      }
 
       /* USART interrupts:
        *
@@ -1786,6 +1790,7 @@ static int up_interrupt_common(struct up_dev_s *priv)
 
            uart_recvchars(&priv->dev);
            handled = true;
+
         }
 
        /* We may still have to read from the DR register to clear any pending
@@ -1814,6 +1819,7 @@ static int up_interrupt_common(struct up_dev_s *priv)
 #endif
         }
 
+
       /* Handle outgoing, transmit bytes */
 
       if ((priv->sr & USART_SR_TXE) != 0 && (priv->ie & USART_CR1_TXEIE) != 0)
@@ -1824,7 +1830,6 @@ static int up_interrupt_common(struct up_dev_s *priv)
            handled = true;
         }
     }
-
   return OK;
 }
 
@@ -2100,13 +2105,13 @@ static void up_rxint(struct uart_dev_s *dev, bool enable)
 #ifdef CONFIG_USART_ERRINTS
       ie |= (USART_CR1_RXNEIE | USART_CR1_PEIE | USART_CR3_EIE);
 #else
-      ie |= USART_CR1_RXNEIE;
+      ie |= USART_CR1_RXNEIE | USART_CR1_PEIE;
 #endif
 #endif
     }
   else
     {
-      ie &= ~(USART_CR1_RXNEIE | USART_CR1_PEIE | USART_CR3_EIE);
+      ie &= ~(USART_CR1_RXNEIE);
     }
 
   /* Then set the new interrupt state */
