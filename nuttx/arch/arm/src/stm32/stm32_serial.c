@@ -2358,15 +2358,15 @@ static void up_status(struct uart_dev_s *dev,int s)
     {
         dev->err |= 0x01;
     }
-    if(s & USART_SR_PE)
+    if(s & USART_SR_FE)
     {
         dev->err |= 0x02;
     }
-    if(s & USART_SR_PE)
+    if(s & USART_SR_NE)
     {
         dev->err |= 0x04;
     }
-    if(s & USART_SR_PE)
+    if(s & USART_SR_ORE)
     {
         dev->err |= 0x08;
     }
