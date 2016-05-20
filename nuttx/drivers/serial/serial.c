@@ -608,6 +608,15 @@ static ssize_t uart_read(FAR struct file *filep, FAR char *buffer, size_t buflen
                 }
             }
 
+          if ((dev->tc_iflag & (PARMRK | INPCK)) && (dev->err & SERIAL_ERR_PE))
+          {
+              *buffer++ = 0;
+              *buffer++ = 0;
+              recvd += 2;
+              ch = 0;
+              dev->err = 0;
+          }
+
           /* Specifically not handled:
            *
            * All of the local modes; echo, line editing, etc.
@@ -1290,6 +1299,7 @@ void uart_datareceived(FAR uart_dev_t *dev)
 
   uart_pollnotify(dev, POLLIN);
 }
+
 
 /************************************************************************************
  * Name: uart_datasent

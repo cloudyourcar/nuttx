@@ -332,6 +332,7 @@ static bool up_rxflowcontrol(struct uart_dev_s *dev);
 static void up_send(struct uart_dev_s *dev, int ch);
 static void up_txint(struct uart_dev_s *dev, bool enable);
 static bool up_txready(struct uart_dev_s *dev);
+static void up_status(struct uart_dev_s *dev, int s);
 
 #ifdef SERIAL_HAVE_DMA
 static int  up_dma_setup(struct uart_dev_s *dev);
@@ -395,6 +396,7 @@ static const struct uart_ops_s g_uart_ops =
   .txint          = up_txint,
   .txready        = up_txready,
   .txempty        = up_txready,
+  .status         = up_status,
 };
 #endif
 
@@ -1738,10 +1740,6 @@ static int up_interrupt_common(struct up_dev_s *priv)
       /* Get the masked USART status word. */
 
       priv->sr = up_serialin(priv, STM32_USART_SR_OFFSET);
-      if((priv->sr & USART_SR_PE) != 0)
-      {
-          set_globalerrno(EINTR); // But we still have to read buffer to clear interrupt flag
-      }
 
       /* USART interrupts:
        *
@@ -2345,6 +2343,37 @@ static bool up_txready(struct uart_dev_s *dev)
   struct up_dev_s *priv = (struct up_dev_s *)dev->priv;
   return ((up_serialin(priv, STM32_USART_SR_OFFSET) & USART_SR_TXE) != 0);
 }
+
+
+/****************************************************************************
+ * Name: up_txready
+ *
+ * Description:
+ *   Cast status code from uc on serial error code
+ *
+ ****************************************************************************/
+static void up_status(struct uart_dev_s *dev,int s)
+{
+    if(s & USART_SR_PE)
+    {
+        dev->err |= 0x01;
+    }
+    if(s & USART_SR_PE)
+    {
+        dev->err |= 0x02;
+    }
+    if(s & USART_SR_PE)
+    {
+        dev->err |= 0x04;
+    }
+    if(s & USART_SR_PE)
+    {
+        dev->err |= 0x08;
+    }
+
+}
+
+
 
 /****************************************************************************
  * Name: up_interrupt_u[s]art[n]

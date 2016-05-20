@@ -62,6 +62,10 @@
 #  define CONFIG_SERIAL_NPOLLWAITERS 2
 #endif
 
+#define SERIAL_ERR_PE 1  //Parity error
+#define SERIAL_ERR_FE 2  //Frame error
+#define SERIAL_ERR_NE 4  //Noise error
+#define SERIAL_ERR_OE 8  //Overrun error
 /* vtable access helpers */
 
 #define uart_setup(dev)          dev->ops->setup(dev)
@@ -77,6 +81,7 @@
 #define uart_txempty(dev)        dev->ops->txempty(dev)
 #define uart_send(dev,ch)        dev->ops->send(dev,ch)
 #define uart_receive(dev,s)      dev->ops->receive(dev,s)
+#define uart_status(dev,s)       dev->ops->status(dev,s)
 
 #ifdef CONFIG_SERIAL_IFLOWCONTROL
 #define uart_rxflowcontrol(dev) \
@@ -191,6 +196,8 @@ struct uart_ops_s
    */
 
   CODE bool (*txempty)(FAR struct uart_dev_s *dev);
+
+  CODE void (*status)(FAR struct uart_dev_s *dev,int s);
 };
 
 /* This is the device structure used by the driver.  The caller of
@@ -250,6 +257,10 @@ struct uart_dev_s
 #ifndef CONFIG_DISABLE_POLL
   struct pollfd *fds[CONFIG_SERIAL_NPOLLWAITERS];
 #endif
+
+  /* Additional flags */
+  uint8_t	err
+
 };
 
 typedef struct uart_dev_s uart_dev_t;
@@ -319,6 +330,8 @@ void uart_recvchars(FAR uart_dev_t *dev);
 
 void uart_datareceived(FAR uart_dev_t *dev);
 
+
+void uart_errreceived(FAR uart_dev_t *dev);
 /************************************************************************************
  * Name: uart_datasent
  *

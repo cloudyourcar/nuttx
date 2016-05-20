@@ -171,7 +171,7 @@ void uart_recvchars(FAR uart_dev_t *dev)
             }
         }
 #endif
-
+      dev->err = 0;
       ch = uart_receive(dev, &status);
 
       /* If the RX buffer becomes full, then the serial data is discarded.  This is
@@ -182,8 +182,11 @@ void uart_recvchars(FAR uart_dev_t *dev)
        * some large internal buffering).
        */
 
+      /* Mark errors codes now,handled it further, outside of interrupt */
+      uart_status(dev,(status>>16)) ;
+
       if (!is_full)
-        {
+      {
           /* Add the character to the buffer */
 
           dev->recv.buffer[dev->recv.head] = ch;
@@ -196,15 +199,16 @@ void uart_recvchars(FAR uart_dev_t *dev)
             {
                nexthead = 0;
             }
-        }
+      }
     }
 
   /* If any bytes were added to the buffer, inform any waiters there there is new
    * incoming data available.
    */
 
+
   if (nbytes)
-    {
+  {
       uart_datareceived(dev);
-    }
+  }
 }
