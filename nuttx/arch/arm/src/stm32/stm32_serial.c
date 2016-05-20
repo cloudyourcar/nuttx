@@ -396,7 +396,6 @@ static const struct uart_ops_s g_uart_ops =
   .txint          = up_txint,
   .txready        = up_txready,
   .txempty        = up_txready,
-  .status         = up_status,
 };
 #endif
 
@@ -2053,6 +2052,8 @@ static int up_receive(struct uart_dev_s *dev, uint32_t *status)
   /* Get the Rx byte plux error information.  Return those in status */
 
   *status  = priv->sr << 16 | rdr;
+  dev->err |= priv->sr & 0x0F;
+
   priv->sr = 0;
 
   /* Then return the actual received byte */
@@ -2103,13 +2104,13 @@ static void up_rxint(struct uart_dev_s *dev, bool enable)
 #ifdef CONFIG_USART_ERRINTS
       ie |= (USART_CR1_RXNEIE | USART_CR1_PEIE | USART_CR3_EIE);
 #else
-      ie |= USART_CR1_RXNEIE | USART_CR1_PEIE;
+      ie |= (USART_CR1_RXNEIE | USART_CR1_PEIE | USART_CR3_EIE);
 #endif
 #endif
     }
   else
     {
-      ie &= ~(USART_CR1_RXNEIE);
+      ie &= ~(USART_CR1_RXNEIE | USART_CR1_PEIE | USART_CR3_EIE);
     }
 
   /* Then set the new interrupt state */
@@ -2344,34 +2345,6 @@ static bool up_txready(struct uart_dev_s *dev)
   return ((up_serialin(priv, STM32_USART_SR_OFFSET) & USART_SR_TXE) != 0);
 }
 
-
-/****************************************************************************
- * Name: up_txready
- *
- * Description:
- *   Cast status code from uc on serial error code
- *
- ****************************************************************************/
-static void up_status(struct uart_dev_s *dev,int s)
-{
-    if(s & USART_SR_PE)
-    {
-        dev->err |= 0x01;
-    }
-    if(s & USART_SR_FE)
-    {
-        dev->err |= 0x02;
-    }
-    if(s & USART_SR_NE)
-    {
-        dev->err |= 0x04;
-    }
-    if(s & USART_SR_ORE)
-    {
-        dev->err |= 0x08;
-    }
-
-}
 
 
 

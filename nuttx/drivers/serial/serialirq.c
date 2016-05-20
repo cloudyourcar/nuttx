@@ -182,9 +182,6 @@ void uart_recvchars(FAR uart_dev_t *dev)
        * some large internal buffering).
        */
 
-      /* Mark errors codes now,handled it further, outside of interrupt */
-      uart_status(dev,(status>>16)) ;
-
       if (!is_full)
       {
           /* Add the character to the buffer */

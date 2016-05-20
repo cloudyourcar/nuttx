@@ -81,7 +81,7 @@
 #define uart_txempty(dev)        dev->ops->txempty(dev)
 #define uart_send(dev,ch)        dev->ops->send(dev,ch)
 #define uart_receive(dev,s)      dev->ops->receive(dev,s)
-#define uart_status(dev,s)       dev->ops->status(dev,s)
+
 
 #ifdef CONFIG_SERIAL_IFLOWCONTROL
 #define uart_rxflowcontrol(dev) \
@@ -197,7 +197,6 @@ struct uart_ops_s
 
   CODE bool (*txempty)(FAR struct uart_dev_s *dev);
 
-  CODE void (*status)(FAR struct uart_dev_s *dev,int s);
 };
 
 /* This is the device structure used by the driver.  The caller of
