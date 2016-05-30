@@ -610,7 +610,7 @@ static ssize_t uart_read(FAR struct file *filep, FAR char *buffer, size_t buflen
 
           if ((dev->tc_iflag & (PARMRK | INPCK)) && (dev->err & SERIAL_ERR_PE))
           {
-              *buffer++ = 0;
+              *buffer++ = 0xff;
               *buffer++ = 0;
               recvd += 2;
               ch = 0;
